@@ -1,4 +1,0 @@
-streamlit
-numpy==1.23.5
-tensorflow==2.14
-requests
