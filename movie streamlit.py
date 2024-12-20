@@ -8,7 +8,6 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 import requests
 
 
-
 # Preprocessing functions
 def remove_emoticons(text):
     emoticon_pattern = re.compile("["  
@@ -22,32 +21,34 @@ def remove_emoticons(text):
     return emoticon_pattern.sub(r'', text)
 
 def preprocessing_text(text):
-    #lowercase ngecilin huruf
+    # lowercase ngecilin huruf
     text = text.lower()
-    #hapus kalimat yang bukan ASCII
+    # hapus kalimat yang bukan ASCII
     text = re.sub(r'[^\x00-\x7F]', '', text)
-    #hapus format url
+    # hapus format url
     text = re.sub(r'http\S+|www\S+|https\S+', '', text, flags=re.MULTILINE)
     text = re.sub(r'http\S+|www\S+|https\S+|[a-zA-Z0-9.-]+\.(com|id|net|org|co|info|tv|io|xyz)\S*', '', text, flags=re.MULTILINE)
     text = re.sub(r'http\S+|www\S+|https\S+|[a-zA-Z0-9.-]+\.(com|id|net|org|co|info|tv|io|xyz|twitter\.com|instagram\.com|facebook\.com)\s*\S*', '', text, flags=re.MULTILINE)
-    #hapus format tag html
+    # hapus format tag html
     text = re.sub(r'<.*?>', '', text)
-    #hapus tanda baca dan nomor
+    # hapus tanda baca dan nomor
     text = re.sub(r'[%s]' % re.escape(string.punctuation), '', text)
     text = re.sub(r'\d+', '', text)
-    #hapus spasi berlebih
+    # hapus spasi berlebih
     text = re.sub(r'\s+', ' ', text).strip()
-    #menghapus karakter berlebih (misalnya loooove harusnya love)
+    # menghapus karakter berlebih (misalnya loooove harusnya love)
     text = re.sub(r'(.)\1{2,}', r'\1', text)
-    text = re.sub("[^A-Za-z\s']"," ", text) #Menghilangkan yang bukan huruf
-    text = re.sub("@[A-Za-z0-9_]+"," ", text) #Menghilangkan mention
-    text = re.sub("#[A-Za-z0-9_]+"," ", text) #Menghilangkan hashtag
+    text = re.sub("[^A-Za-z\s']"," ", text)  # Menghilangkan yang bukan huruf
+    text = re.sub("@[A-Za-z0-9_]+"," ", text)  # Menghilangkan mention
+    text = re.sub("#[A-Za-z0-9_]+"," ", text)  # Menghilangkan hashtag
     # text = re.sub("rt", " ", text, flags=re.IGNORECASE) #menghilangkan RT
     text = re.sub(r'(\W)\1+', r'\1', text)  # Menghapus tanda baca yang berulang
     text = re.sub(r'[^\w\s]', '', text)  # Menghapus semua tanda baca
+    # hapus enter (newline)
+    text = re.sub(r'[\r\n]+', ' ', text)  # Mengganti newline dengan spasi
     return text
 
-import pickle  # Import the pickle module
+
 
 # Load tokenizer saat testing
 with open('tokenizer_final.pickle', 'rb') as handle:
@@ -69,7 +70,7 @@ if st.button("Analyze Sentiment"):
 
         # tokenizer.fit_on_texts([processed_text])  # Fit tokenizer on the input text
         X_input_seq = tokenizer.texts_to_sequences([processed_text])
-        max_len = 650
+        max_len = 274
         X_input_padded = pad_sequences(X_input_seq, maxlen=max_len, padding='post')
 
         # API Request setup
@@ -94,7 +95,7 @@ if st.button("Analyze Sentiment"):
 
         # API Request for prediction #ganti endpoint
         response_scoring = requests.post(
-            'https://us-south.ml.cloud.ibm.com/ml/v4/deployments/90a6ab2e-6f3c-4293-a663-4e4f9c767033/predictions?version=2021-05-01', # endpointnya diganti
+            'https://us-south.ml.cloud.ibm.com/ml/v4/deployments/streamlit_capstone_server/predictions?version=2021-05-01', # endpointnya diganti
             json=payload_scoring,
             headers=header
         )
